@@ -1,0 +1,52 @@
+/*
+ * client.c - QNX message-passing client
+ *
+ * Connects to a server using pid/chid, sends a string for
+ * checksum calculation, and prints the server's reply.
+ *
+ * Usage: client <server_pid> <server_chid> <string>
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/neutrino.h>
+
+#include "msg_def.h"
+
+int main(int argc, char *argv[])
+{
+	int         coid;
+	cksum_msg_t msg;
+	int         incoming_checksum;
+	int         status;
+
+	if (argc != 4) {
+		printf("Usage: client <server_pid> <server_chid> <string>\n");
+		exit(EXIT_FAILURE);
+	}
+
+	int server_pid  = atoi(argv[1]);
+	int server_chid = atoi(argv[2]);
+
+	printf("Connecting to server pid: %d, chid: %d\n", server_pid, server_chid);
+
+	coid = ConnectAttach(0, server_pid, server_chid, _NTO_SIDE_CHANNEL, 0);
+	if (coid == -1) {
+		perror("ConnectAttach");
+		exit(EXIT_FAILURE);
+	}
+
+	msg.msg_type = CKSUM_MSG_TYPE;
+	strlcpy(msg.string_to_cksum, argv[3], sizeof(msg.string_to_cksum));
+	printf("Sending: %s\n", msg.string_to_cksum);
+
+	status = MsgSend(coid, &msg, sizeof(msg), &incoming_checksum, sizeof(incoming_checksum));
+	if (status == -1) {
+		perror("MsgSend");
+		exit(EXIT_FAILURE);
+	}
+
+	printf("Checksum: %d\n", incoming_checksum);
+	return EXIT_SUCCESS;
+}

@@ -1,0 +1,33 @@
+# Compiled binaries
+*.o
+example
+interrupt_event
+interrupt_thread
+server
+client
+pulse_server
+pulse_client
+name_server
+name_client
+event_server
+event_client
+shmem_creator
+shmem_user
+shmem_qnx_server
+shmem_qnx_client
+mutex_recovery
+iov_server
+iov_client
+nomutex
+mutex_sync
+prodcons
+condvar
+condvar_queue
+spawn_example
+death_pulse
+reptimer
+nonblockpulserec
+
+# Boot images
+*.ifs
+*.sym
